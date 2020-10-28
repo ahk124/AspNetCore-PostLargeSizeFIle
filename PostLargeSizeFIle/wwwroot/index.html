@@ -1,0 +1,43 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>ASP.NET Core - Uploading a file</title>
+</head>
+<body>
+
+    <form id="form1" method="post" action="/file" enctype="multipart/form-data">
+        <p>
+            <input type="file" name="file" id="file1" value="" />
+        </p>
+        <p>
+            <input type="submit" value="Upload" id="submit1" disabled />
+        </p>
+    </form>
+
+    <div id="panel1" style="display:none;">
+        <p>Uploading...</p>
+    </div>
+
+    <script>
+        const form1 = document.getElementById('form1');
+        const file1 = document.getElementById('file1');
+        const submit1 = document.getElementById('submit1');
+        const panel1 = document.getElementById('panel1');
+
+        file1.onchange = function () {
+            if (file1.value === '') {
+                submit1.setAttribute('disabled', '');
+            }
+            else {
+                submit1.removeAttribute('disabled');
+            }
+        }
+
+        form1.onsubmit = function () {
+            form1.style.display = 'none';
+            panel1.style.display = 'block';
+            return true;
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="_FileStore\**" />
+    <Content Remove="_FileStore\**" />
+    <EmbeddedResource Remove="_FileStore\**" />
+    <None Remove="_FileStore\**" />
+  </ItemGroup>
+
+</Project>
