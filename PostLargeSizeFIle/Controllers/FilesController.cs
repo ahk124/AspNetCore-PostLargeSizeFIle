@@ -16,6 +16,8 @@ namespace PostLargeSizeFIle.Controllers
         private IWebHostEnvironment HostEnvironment { get; }
 
         [HttpPost("/file")]
+        [DisableRequestSizeLimit]
+        [RequestFormLimits(MultipartBodyLengthLimit = long.MaxValue, ValueLengthLimit = int.MaxValue)]
         public async Task<IActionResult> OnPostAsync(IFormFile file)
         {
             var saveDir = Path.Combine(HostEnvironment.ContentRootPath, "_FileStore");
