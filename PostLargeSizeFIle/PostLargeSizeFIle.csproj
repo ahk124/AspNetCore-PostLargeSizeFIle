@@ -5,6 +5,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Azure.Storage.Blobs" Version="12.6.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Remove="_FileStore\**" />
     <Content Remove="_FileStore\**" />
     <EmbeddedResource Remove="_FileStore\**" />

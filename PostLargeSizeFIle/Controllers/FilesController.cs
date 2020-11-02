@@ -1,29 +1,31 @@
 ﻿using System.IO;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Hosting;
+using Azure.Storage.Blobs;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Net.Http.Headers;
 
 namespace PostLargeSizeFIle.Controllers
 {
     public class FilesController : Controller
     {
-        public FilesController(IWebHostEnvironment hostEnvironment)
+        public FilesController(IConfiguration configuration)
         {
-            HostEnvironment = hostEnvironment;
+            Configuration = configuration;
         }
 
-        private IWebHostEnvironment HostEnvironment { get; }
+        private IConfiguration Configuration { get; }
 
         [HttpPost("/file")]
         [DisableRequestSizeLimit]
         [DisableFormValueModelBinding]
         public async Task<IActionResult> OnPostAsync()
         {
-            var saveDir = Path.Combine(HostEnvironment.ContentRootPath, "_FileStore");
-            if (!Directory.Exists(saveDir)) Directory.CreateDirectory(saveDir);
+            var connectionString = Configuration.GetConnectionString("FileStore");
+            var containerClient = new BlobContainerClient(connectionString, "filestore");
+            await containerClient.CreateIfNotExistsAsync();
 
             // https://docs.microsoft.com/en-us/aspnet/core/mvc/models/file-uploads#upload-large-files-with-streaming-1
             if (!MultipartRequestHelper.IsMultipartContentType(Request.ContentType)) return BadRequest($"Expected a multipart request, but got {Request.ContentType}");
@@ -38,10 +40,7 @@ namespace PostLargeSizeFIle.Controllers
                 if (hasContentDispositionHeader && MultipartRequestHelper.HasFileContentDisposition(contentDisposition))
                 {
                     var fileName = Path.GetFileName(contentDisposition.FileName.Value);
-                    var savePath = Path.Combine(saveDir, fileName);
-
-                    using var stream = System.IO.File.Create(savePath);
-                    await section.Body.CopyToAsync(stream);
+                    await containerClient.UploadBlobAsync(fileName, section.Body);
                 }
 
                 section = await reader.ReadNextSectionAsync();
